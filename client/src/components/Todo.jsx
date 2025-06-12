@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
+
 const URL = "http://localhost:5000";
 
 const Todo = () => {
@@ -15,11 +17,10 @@ const Todo = () => {
 
   const fetchTodos = async () => {
     try {
-      const res = await fetch(`${URL}/api/todo`);
-      const data = await res.json();
-      setTodos(data.reverse()); // Show latest first
+      const res = await axios.get(`${URL}/api/todo`);
+      setTodos(res.data.reverse());
     } catch (error) {
-      console.error("Failed to fetch todos:", error);
+      console.error("Failed to fetch todos:", error.message);
     }
   };
 
@@ -33,33 +34,23 @@ const Todo = () => {
       return;
     }
     try {
-      const res = await fetch(`${URL}/api/todo`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task, status, deadline }),
-      });
-      if (res.ok) {
-        setTask("");
-        setStatus("");
-        setDeadline("");
-        fetchTodos();
-      } else {
-        const errorData = await res.json();
-        alert("Error: " + errorData.error);
-      }
+      await axios.post(`${URL}/api/todo`, { task, status, deadline });
+      setTask("");
+      setStatus("");
+      setDeadline("");
+      fetchTodos();
     } catch (error) {
-      console.error("Failed to add todo:", error);
+      console.error("Failed to add todo:", error.message);
+      alert("Error: " + error.response?.data?.error || "Something went wrong");
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`${URL}/api/todo/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        fetchTodos();
-      }
+      await axios.delete(`${URL}/api/todo/${id}`);
+      fetchTodos();
     } catch (error) {
-      console.error("Failed to delete todo:", error);
+      console.error("Failed to delete todo:", error.message);
     }
   };
 
@@ -74,18 +65,12 @@ const Todo = () => {
 
   const saveEdit = async (id) => {
     try {
-      const res = await fetch(`${URL}/api/todo/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editData),
-      });
-      if (res.ok) {
-        setEditId(null);
-        setEditData({ task: "", status: "", deadline: "" });
-        fetchTodos();
-      }
+      await axios.put(`${URL}/api/todo/${id}`, editData);
+      setEditId(null);
+      setEditData({ task: "", status: "", deadline: "" });
+      fetchTodos();
     } catch (error) {
-      console.error("Failed to update todo:", error);
+      console.error("Failed to update todo:", error.message);
     }
   };
 
