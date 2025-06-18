@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose from "mongoose";
 
 const todoSchema = new mongoose.Schema({
   task: {
@@ -8,9 +8,6 @@ const todoSchema = new mongoose.Schema({
   status: {
     type: String,
     required: true,
-  },
-  deadline: {
-    type: Date,
   },
 });
 const Todo = mongoose.model("Todo", todoSchema);

@@ -6,14 +6,9 @@ const URL = "http://localhost:5000";
 const Todo = () => {
   const [task, setTask] = useState("");
   const [status, setStatus] = useState("");
-  const [deadline, setDeadline] = useState("");
   const [todos, setTodos] = useState([]);
   const [editId, setEditId] = useState(null);
-  const [editData, setEditData] = useState({
-    task: "",
-    status: "",
-    deadline: "",
-  });
+  const [editData, setEditData] = useState({ task: "", status: "" });
 
   const fetchTodos = async () => {
     try {
@@ -34,13 +29,11 @@ const Todo = () => {
       return;
     }
     try {
-      await axios.post(`${URL}/api/todo`, { task, status, deadline });
+      await axios.post(`${URL}/api/todo`, { task, status });
       setTask("");
       setStatus("");
-      setDeadline("");
       fetchTodos();
     } catch (error) {
-      console.error("Failed to add todo:", error.message);
       alert("Error: " + error.response?.data?.error || "Something went wrong");
     }
   };
@@ -56,18 +49,14 @@ const Todo = () => {
 
   const startEdit = (todo) => {
     setEditId(todo._id);
-    setEditData({
-      task: todo.task,
-      status: todo.status,
-      deadline: todo.deadline?.split("T")[0] || "",
-    });
+    setEditData({ task: todo.task, status: todo.status });
   };
 
   const saveEdit = async (id) => {
     try {
       await axios.put(`${URL}/api/todo/${id}`, editData);
       setEditId(null);
-      setEditData({ task: "", status: "", deadline: "" });
+      setEditData({ task: "", status: "" });
       fetchTodos();
     } catch (error) {
       console.error("Failed to update todo:", error.message);
@@ -75,7 +64,7 @@ const Todo = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto p-4 space-y-6 mt-20">
+    <div className="max-w-md mx-auto p-4 space-y-6 mt-10">
       <h2 className="text-xl font-bold text-center">Todo List</h2>
 
       <div className="space-y-2">
@@ -100,13 +89,6 @@ const Todo = () => {
           <option value="completed">Completed</option>
           <option value="ongoing">Ongoing</option>
         </select>
-        <label className="label">Deadline</label>
-        <input
-          type="date"
-          className="input input-bordered w-full"
-          value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
-        />
         <button onClick={handleAddTodo} className="btn btn-primary w-full">
           Add Todo
         </button>
@@ -137,14 +119,6 @@ const Todo = () => {
                   <option value="completed">Completed</option>
                   <option value="ongoing">Ongoing</option>
                 </select>
-                <input
-                  type="date"
-                  className="input input-bordered mb-2 w-full max-w-xs"
-                  value={editData.deadline}
-                  onChange={(e) =>
-                    setEditData({ ...editData, deadline: e.target.value })
-                  }
-                />
                 <div className="flex gap-2">
                   <button
                     onClick={() => saveEdit(todo._id)}
@@ -164,12 +138,6 @@ const Todo = () => {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="font-medium">{todo.task}</p>
-                  <p className="text-sm">
-                    Deadline:{" "}
-                    {todo.deadline
-                      ? new Date(todo.deadline).toLocaleDateString()
-                      : "None"}
-                  </p>
                   <p className="text-sm">Status: {todo.status}</p>
                 </div>
                 <div className="flex flex-row gap-1">

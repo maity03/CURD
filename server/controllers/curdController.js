@@ -13,9 +13,8 @@ export const getTodo = async (req, res) => {
 //creating a task
 export const createTodo = async (req, res) => {
   try {
-    const { task, status, deadline } = req.body;
-    const todo = await Todo.create({ task, status, deadline });
-    // Return the newly created todo object with 201 status
+    const { task, status } = req.body;
+    const todo = await Todo.create({ task, status });
     res.status(201).json(todo);
   } catch (err) {
     res.status(400).json({ error: err.message });
@@ -25,10 +24,10 @@ export const createTodo = async (req, res) => {
 //Update a todo
 export const updateTodo = async (req, res) => {
   try {
-    const { task, status, deadline } = req.body;
+    const { task, status } = req.body;
     const updatedTodo = await Todo.findByIdAndUpdate(
       req.params.id,
-      { task, status, deadline },
+      { task, status },
       { new: true, runValidators: true }
     );
     if (!updatedTodo) {
